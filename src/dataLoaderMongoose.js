@@ -5,8 +5,11 @@ const mapDataToHash = data => (
   }, {})
 );
 
-export const loader = async (model, ids) => {
-  const data = await model.find({ _id: { $in: ids } });
+export const loader = async (model, ids, projection) => {
+  const data = (projection && typeof projection !== 'undefined' && Object.keys(projection).length > 0) 
+    ? await model.find({ _id: { $in: ids } }).select(projection)
+    : await model.find({ _id: { $in: ids } });
+  
   const hash = mapDataToHash(data);
   return ids.map((id) => {
     if (hash[id.toString()]) {
